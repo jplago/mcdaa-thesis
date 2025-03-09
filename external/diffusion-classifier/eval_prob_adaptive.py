@@ -127,7 +127,7 @@ def main():
 
     # dataset args
     parser.add_argument('--dataset', type=str, default='pets',
-                        choices=['pets', 'flowers', 'stl10', 'mnist', 'cifar10', 'food', 'caltech101', 'imagenet',
+                        choices=['sub-cifar10', 'pets', 'flowers', 'stl10', 'mnist', 'cifar10', 'food', 'caltech101', 'imagenet',
                                  'objectnet', 'aircraft'], help='Dataset to use')
     parser.add_argument('--split', type=str, default='train', choices=['train', 'test'], help='Name of split')
 

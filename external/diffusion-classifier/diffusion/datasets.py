@@ -8,6 +8,7 @@ from diffusion.utils import DATASET_ROOT, get_classes_templates
 from diffusion.dataset.objectnet import ObjectNetBase
 from diffusion.dataset.imagenet_classnames import get_classnames
 from imagenetv2_pytorch import ImageNetV2Dataset
+from datasets import load_dataset
 from PIL import Image
 
 IMAGENET_A_CLASSES = [
@@ -81,7 +82,24 @@ class ImageNetA(torch.utils.data.Dataset):
             img = self.transform(img)
         return img, label
 
+class HuggingFaceDataset(torch.utils.data.Dataset):
+    def __init__(self, hf_dataset, transform=None):
+        self.hf_dataset = hf_dataset
+        self.transform = transform
 
+    def __len__(self):
+        return len(self.hf_dataset)
+
+    def __getitem__(self, idx):
+        # Convert the image array to PIL.Image
+        img = self.hf_dataset[idx]['image']
+        label = self.hf_dataset[idx]['label']
+        
+        if self.transform:
+            img = self.transform(img)
+        
+        return img, label
+    
 def get_target_dataset(name: str, train=False, transform=None, target_transform=None):
     """Get the torchvision dataset that we want to use.
     If the dataset doesn't have a class_to_idx attribute, we add it.
@@ -91,6 +109,11 @@ def get_target_dataset(name: str, train=False, transform=None, target_transform=
     if name == "cifar10":
         dataset = datasets.CIFAR10(root=DATASET_ROOT, train=train, transform=transform,
                                    target_transform=target_transform, download=True)
+    elif name == "sub-cifar10":
+        hf_dataset = load_dataset("lagobellojp/sub-cifar10", split='train') # TODO: should be test
+        dataset = HuggingFaceDataset(hf_dataset, transform=transform)
+        dataset.class_to_idx = {cls.lower():i for i,cls in enumerate(hf_dataset.features['label'].names)}
+ 
     elif name == "stl10":
         dataset = datasets.STL10(root=DATASET_ROOT, split="train" if train else "test", transform=transform,
                                  target_transform=target_transform, download=True)
@@ -177,7 +200,7 @@ def get_target_dataset(name: str, train=False, transform=None, target_transform=
     else:
         raise ValueError(f"Dataset {name} not supported.")
 
-    if name in {'mnist', 'cifar10', 'stl10', 'aircraft'}:
+    if name in {'sub-cifar10', 'mnist', 'cifar10', 'stl10', 'aircraft'}:
         dataset.file_to_class = {
             str(idx): dataset[idx][1]
             for idx in range(len(dataset))
