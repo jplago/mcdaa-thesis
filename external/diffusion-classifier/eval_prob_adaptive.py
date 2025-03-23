@@ -7,7 +7,7 @@ import torch
 import torch.nn.functional as F
 import tqdm
 from diffusion.datasets import get_target_dataset
-from diffusion.models import get_sd_model, get_scheduler_config
+from diffusion.models import get_sd_model, get_scheduler_config, get_sd_model_roentgen
 from diffusion.utils import LOG_DIR, get_formatstr
 import torchvision.transforms as torch_transforms
 from torchvision.transforms.functional import InterpolationMode
@@ -127,12 +127,13 @@ def main():
 
     # dataset args
     parser.add_argument('--dataset', type=str, default='pets',
-                        choices=['sub-cifar10', 'pets', 'flowers', 'stl10', 'mnist', 'cifar10', 'food', 'caltech101', 'imagenet',
+                        choices=['sub-cifar10', 'synthetic-effusion-12', 'pets', 'flowers', 'stl10', 'mnist', 'cifar10', 'food', 'caltech101', 'imagenet',
                                  'objectnet', 'aircraft'], help='Dataset to use')
     parser.add_argument('--split', type=str, default='train', choices=['train', 'test'], help='Name of split')
 
     # run args
     parser.add_argument('--version', type=str, default='2-0', help='Stable Diffusion model version')
+    parser.add_argument('--model_path', type=str, default='', help='Stable Diffusion model path')
     parser.add_argument('--img_size', type=int, default=512, choices=(256, 512), help='Number of trials per timestep')
     parser.add_argument('--batch_size', '-b', type=int, default=32)
     parser.add_argument('--n_trials', type=int, default=1, help='Number of trials per timestep')
@@ -182,7 +183,11 @@ def main():
     prompts_df = pd.read_csv(args.prompt_path)
 
     # load pretrained models
-    vae, tokenizer, text_encoder, unet, scheduler = get_sd_model(args)
+    if args.version.startswith('roentgen'):
+        vae, tokenizer, text_encoder, unet, scheduler = get_sd_model_roentgen(args)
+    else:
+        vae, tokenizer, text_encoder, unet, scheduler = get_sd_model(args)
+    # TODO: duplicated for roentgen
     vae = vae.to(device)
     text_encoder = text_encoder.to(device)
     unet = unet.to(device)
