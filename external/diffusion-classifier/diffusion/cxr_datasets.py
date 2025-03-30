@@ -16,6 +16,7 @@ class CXRDataset(Dataset):
             str(idx): self.data.iloc[idx]['label']
             for idx in range(len(self.data))
         }
+        self.class_to_idx = {0:0, 1:1}
     
     def __len__(self):
         return len(self.data)
