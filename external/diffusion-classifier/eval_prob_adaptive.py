@@ -180,7 +180,7 @@ def main():
     interpolation = INTERPOLATIONS[args.interpolation]
     transform = get_transform(interpolation, args.img_size)
     latent_size = args.img_size // 8
-    target_dataset = get_target_dataset(args.dataset, train=args.split == 'train', transform=transform, csv_file=args.csv_file)
+    target_dataset = get_target_dataset(args.dataset, train=args.split == 'train', transform=transform, csv_file=args.csv_file, dataset_base_path=args.dataset_base_path)
     prompts_df = pd.read_csv(args.prompt_path)
 
     # load pretrained models
