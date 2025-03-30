@@ -9,7 +9,7 @@ MODEL_IDS = {
     '1-4': "CompVis/stable-diffusion-v1-4",
     '1-5': "runwayml/stable-diffusion-v1-5",
     '2-0': "stabilityai/stable-diffusion-2-base",
-    '2-1': "stabilityai/stable-diffusion-2-1-base"
+    '2-1': "stabilityai/stable-diffusion-2-1-base",
 }
 
 
@@ -32,9 +32,30 @@ def get_sd_model(args):
     unet = pipe.unet
     return vae, tokenizer, text_encoder, unet, scheduler
 
+def get_sd_model_roentgen(args):
+    if args.dtype == 'float32':
+        dtype = torch.float32
+    elif args.dtype == 'float16':
+        dtype = torch.float16
+    else:
+        raise NotImplementedError
+
+    assert args.version == "roentgen_v1"
+    model_id = args.model_path
+    
+    pipe = StableDiffusionPipeline.from_pretrained(model_id).to(torch.float16)
+    
+    pipe.enable_xformers_memory_efficient_attention()
+    scheduler = pipe.scheduler
+    vae = pipe.vae
+    tokenizer = pipe.tokenizer
+    text_encoder = pipe.text_encoder
+    unet = pipe.unet
+    return vae, tokenizer, text_encoder, unet, scheduler
+
 
 def get_scheduler_config(args):
-    if args.version in {'1-1', '1-2', '1-3', '1-4', '1-5'}:
+    if args.version in {'1-1', '1-2', '1-3', '1-4', '1-5', 'roentgen_v1'}:
         config = {
             "_class_name": "EulerDiscreteScheduler",
             "_diffusers_version": "0.14.0",
