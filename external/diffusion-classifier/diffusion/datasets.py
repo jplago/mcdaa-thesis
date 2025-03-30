@@ -83,7 +83,7 @@ class ImageNetA(torch.utils.data.Dataset):
         return img, label
 
 
-def get_target_dataset(name: str, train=False, transform=None, target_transform=None, csv_file = None):
+def get_target_dataset(name: str, train=False, transform=None, target_transform=None, csv_file = None, dataset_base_path = None):
     """Get the torchvision dataset that we want to use.
     If the dataset doesn't have a class_to_idx attribute, we add it.
     Also add a file-to-class map for evaluation
@@ -176,7 +176,7 @@ def get_target_dataset(name: str, train=False, transform=None, target_transform=
         dataset = MNIST(root=DATASET_ROOT, train=train, transform=transform, target_transform=target_transform,
                         download=True)
     elif name == "cxr_test":
-        dataset = CXRDataset(csv_file=csv_file, transform=transform)
+        dataset = CXRDataset(csv_file=csv_file, dataset_base_path=dataset_base_path, transform=transform)
     else:
         raise ValueError(f"Dataset {name} not supported.")
 

@@ -130,6 +130,7 @@ def main():
                         choices=['pets', 'flowers', 'stl10', 'mnist', 'cifar10', 'food', 'caltech101', 'imagenet',
                                  'objectnet', 'aircraft', 'cxr_test'], help='Dataset to use')
     parser.add_argument('--csv_file', type=str, required = False, help = 'In case of using cxr_test as dataset provide the csv file for the records')
+    parser.add_argument('--dataset_base_path', type=str, required = False, help = 'In case of using cxr_test as dataset provide the base folder path of the dataset')
     parser.add_argument('--split', type=str, default='train', choices=['train', 'test'], help='Name of split')
 
     # run args

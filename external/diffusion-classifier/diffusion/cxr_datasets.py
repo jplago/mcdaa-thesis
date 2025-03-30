@@ -3,11 +3,13 @@ import torch
 from torch.utils.data import Dataset
 from PIL import Image
 import torchvision.transforms as transforms
+import os
 
 class CXRDataset(Dataset):
-    def __init__(self, csv_file, transform=None):
+    def __init__(self, csv_file, dataset_base_path, transform=None):
         self.data = pd.read_csv(csv_file)
         self.transform = transform
+        self.base_path = dataset_base_path
         
         # Create a mapping from file index to label
         self.file_to_class = {
@@ -19,7 +21,7 @@ class CXRDataset(Dataset):
         return len(self.data)
     
     def __getitem__(self, idx):
-        img_path = self.data.iloc[idx]['record_path']
+        img_path = os.path.join(self.base_path, self.data.iloc[idx]['record_path'])
         label = int(self.data.iloc[idx]['label'])
         
         image = Image.open(img_path).convert('RGB')
