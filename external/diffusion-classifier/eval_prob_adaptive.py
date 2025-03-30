@@ -128,7 +128,8 @@ def main():
     # dataset args
     parser.add_argument('--dataset', type=str, default='pets',
                         choices=['pets', 'flowers', 'stl10', 'mnist', 'cifar10', 'food', 'caltech101', 'imagenet',
-                                 'objectnet', 'aircraft'], help='Dataset to use')
+                                 'objectnet', 'aircraft', 'cxr_test'], help='Dataset to use')
+    parser.add_argument('--csv_file', type=str, required = False, help = 'In case of using cxr_test as dataset provide the csv file for the records')
     parser.add_argument('--split', type=str, default='train', choices=['train', 'test'], help='Name of split')
 
     # run args
@@ -178,7 +179,7 @@ def main():
     interpolation = INTERPOLATIONS[args.interpolation]
     transform = get_transform(interpolation, args.img_size)
     latent_size = args.img_size // 8
-    target_dataset = get_target_dataset(args.dataset, train=args.split == 'train', transform=transform)
+    target_dataset = get_target_dataset(args.dataset, train=args.split == 'train', transform=transform, csv_file=args.csv_file)
     prompts_df = pd.read_csv(args.prompt_path)
 
     # load pretrained models

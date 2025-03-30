@@ -8,6 +8,7 @@ from diffusion.utils import DATASET_ROOT, get_classes_templates
 from diffusion.dataset.objectnet import ObjectNetBase
 from diffusion.dataset.imagenet_classnames import get_classnames
 from imagenetv2_pytorch import ImageNetV2Dataset
+from .cxr_datasets import CXRDataset
 from PIL import Image
 
 IMAGENET_A_CLASSES = [
@@ -82,7 +83,7 @@ class ImageNetA(torch.utils.data.Dataset):
         return img, label
 
 
-def get_target_dataset(name: str, train=False, transform=None, target_transform=None):
+def get_target_dataset(name: str, train=False, transform=None, target_transform=None, csv_file = None):
     """Get the torchvision dataset that we want to use.
     If the dataset doesn't have a class_to_idx attribute, we add it.
     Also add a file-to-class map for evaluation
@@ -174,6 +175,8 @@ def get_target_dataset(name: str, train=False, transform=None, target_transform=
     elif name == "mnist":
         dataset = MNIST(root=DATASET_ROOT, train=train, transform=transform, target_transform=target_transform,
                         download=True)
+    elif name == "cxr_test":
+        dataset = CXRDataset(csv_file=csv_file, transform=transform)
     else:
         raise ValueError(f"Dataset {name} not supported.")
 
