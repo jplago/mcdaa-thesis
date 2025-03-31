@@ -88,6 +88,19 @@ class HuggingFaceDataset(torch.utils.data.Dataset):
         self.hf_dataset = hf_dataset
         self.transform = transform
 
+    def __len__(self):
+        return len(self.hf_dataset)
+
+    def __getitem__(self, idx):
+        # Convert the image array to PIL.Image
+        img = self.hf_dataset[idx]['image']
+        label = self.hf_dataset[idx]['label']
+        
+        if self.transform:
+            img = self.transform(img)
+        
+        return img, label
+
 def get_target_dataset(name: str, train=False, transform=None, target_transform=None, csv_file = None, dataset_base_path = None):
     """Get the torchvision dataset that we want to use.
     If the dataset doesn't have a class_to_idx attribute, we add it.
