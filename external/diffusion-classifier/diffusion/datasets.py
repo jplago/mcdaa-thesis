@@ -187,10 +187,14 @@ def get_target_dataset(name: str, train=False, transform=None, target_transform=
                         download=True)
     elif name == "cxr_test":
         dataset = CXRDataset(csv_file=csv_file, dataset_base_path=dataset_base_path, transform=transform)
+    elif name == "synthetic-effusion-12":
+        hf_dataset = load_dataset("lagobellojp/synthetic_effusion_dataset_12", split='train') # TODO: should be test
+        dataset = HuggingFaceDataset(hf_dataset, transform=transform)
+        dataset.class_to_idx = {cls.lower():i for i,cls in enumerate(hf_dataset.features['label'].names)}
     else:
         raise ValueError(f"Dataset {name} not supported.")
 
-    if name in {'sub-cifar10', 'mnist', 'cifar10', 'stl10', 'aircraft'}:
+    if name in {'sub-cifar10', 'synthetic-effusion-12', 'mnist', 'cifar10', 'stl10', 'aircraft'}:
         dataset.file_to_class = {
             str(idx): dataset[idx][1]
             for idx in range(len(dataset))

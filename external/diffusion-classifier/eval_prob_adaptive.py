@@ -127,8 +127,8 @@ def main():
 
     # dataset args
     parser.add_argument('--dataset', type=str, default='pets',
-                        choices=['pets', 'flowers', 'stl10', 'mnist', 'cifar10', 'food', 'caltech101', 'imagenet',
-                                 'objectnet', 'aircraft', 'cxr_test'], help='Dataset to use')
+                        choices=['pets', 'flowers', 'stl10', 'mnist', 'cifar10', 'sub-cifar10', 'food', 'caltech101', 'imagenet',
+                                 'objectnet', 'aircraft', 'cxr_test', 'synthetic-effusion-12'], help='Dataset to use')
     parser.add_argument('--csv_file', type=str, required = False, help = 'In case of using cxr_test as dataset provide the csv file for the records')
     parser.add_argument('--dataset_base_path', type=str, required = False, help = 'In case of using cxr_test as dataset provide the base folder path of the dataset')
     parser.add_argument('--split', type=str, default='train', choices=['train', 'test'], help='Name of split')
