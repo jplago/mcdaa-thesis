@@ -250,6 +250,8 @@ def main():
         pred_idx, pred_errors = eval_prob_adaptive(unet, x0, text_embeddings, scheduler, args, latent_size, all_noise)
         pred = prompts_df.classidx[pred_idx]
         torch.save(dict(errors=pred_errors, pred=pred, label=label), fname)
+        print(f'label: {label}')
+        print(f'pred: {pred}')
         if pred == label:
             correct += 1
         total += 1
