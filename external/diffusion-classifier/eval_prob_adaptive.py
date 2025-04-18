@@ -235,6 +235,8 @@ def main():
             print('Skipping', i)
             if args.load_stats:
                 data = torch.load(fname)
+                print(f'label: {data['label']}')
+                print(f'pred: {data['pred']}')
                 correct += int(data['pred'] == data['label'])
                 total += 1
             continue
