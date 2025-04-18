@@ -25,7 +25,7 @@ def get_sd_model(args):
     model_id = MODEL_IDS[args.version]
     scheduler = EulerDiscreteScheduler.from_pretrained(model_id, subfolder="scheduler")
     pipe = StableDiffusionPipeline.from_pretrained(model_id, scheduler=scheduler, torch_dtype=dtype)
-    pipe.enable_xformers_memory_efficient_attention()
+    #pipe.enable_xformers_memory_efficient_attention()
     vae = pipe.vae
     tokenizer = pipe.tokenizer
     text_encoder = pipe.text_encoder
@@ -45,7 +45,7 @@ def get_sd_model_roentgen(args):
     
     pipe = StableDiffusionPipeline.from_pretrained(model_id).to(torch.float16)
     
-    pipe.enable_xformers_memory_efficient_attention()
+    #pipe.enable_xformers_memory_efficient_attention()
     scheduler = pipe.scheduler
     vae = pipe.vae
     tokenizer = pipe.tokenizer
