@@ -2,6 +2,7 @@ import os
 import argparse
 from PIL import Image
 from multiprocessing import Pool, cpu_count
+import random
 
 # Function to process a single image
 def process_image(input_output_paths):
@@ -48,10 +49,14 @@ def process_images_parallel(process_folder):
                 image_paths.append((os.path.join(root, file), output_path))
     
     print(f'Total images to process: {len(image_paths)}')
+    image_paths = random.sample(image_paths, 50)
+    print(f'Total sampled images: {len(image_paths)}')
+    
     
     # Use multiprocessing to process images in parallel
-    with Pool(processes=cpu_count()) as pool:
-        print(f'Using {cpu_count()} cpu cores')# Uses all available CPU cores
+    #with Pool(processes=cpu_count()) as pool:
+    with Pool(processes=4) as pool:
+        print(f'Available {cpu_count()} cpu cores') # Uses all available CPU cores
         results = pool.map(process_image, image_paths)
     
     print(f'Processed {len(results)} images')
