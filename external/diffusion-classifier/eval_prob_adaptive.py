@@ -221,6 +221,7 @@ def main():
             text_embeddings = text_encoder(
                 text_input.input_ids[i: i + 100].to(device),
             )[0]
+            print(f'text_embeddings shape: {text_embeddings.shape}')
             if invert_prompt[i]:
                 text_embeddings = -text_embeddings
                 print(f'inverting prompt {i}')
