@@ -203,15 +203,23 @@ def main():
     else:
         all_noise = None
 
+    # check for negative embedding token
+    
+    
     # refer to https://github.com/huggingface/diffusers/blob/main/src/diffusers/pipelines/stable_diffusion/pipeline_stable_diffusion.py#L276
     text_input = tokenizer(prompts_df.prompt.tolist(), padding="max_length",
                            max_length=tokenizer.model_max_length, truncation=True, return_tensors="pt")
+    print(f'model max length: {tokenizer.model_max_length}')
     embeddings = []
     with torch.inference_mode():
         for i in range(0, len(text_input.input_ids), 100):
+            print(f'embeddings start index: {i}')
             text_embeddings = text_encoder(
                 text_input.input_ids[i: i + 100].to(device),
             )[0]
+            if prompts_df.invert.tolist()[i] == 1:
+                text_embeddings = -text_embeddings
+                print(f'inverting prompt {i}')
             embeddings.append(text_embeddings)
     text_embeddings = torch.cat(embeddings, dim=0)
     assert len(text_embeddings) == len(prompts_df)

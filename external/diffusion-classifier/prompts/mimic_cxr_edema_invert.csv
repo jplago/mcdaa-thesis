@@ -1,0 +1,4 @@
+prompt,classname,classidx,invert
+no pulmonary edema.,0,0,0 
+pulmonary edema.,1,1,0
+pulmonary edema.,1,1,1
