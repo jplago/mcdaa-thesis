@@ -204,20 +204,24 @@ def main():
         all_noise = None
 
     # check for negative embedding token
-    
+    prompts = prompts_df.prompt.tolist()
+    invert_prompt = [prompt.startswith('<-1>') for prompt in prompts]
+    prompts = [prompt.lstrip('<-1>') for prompt in prompts]
     
     # refer to https://github.com/huggingface/diffusers/blob/main/src/diffusers/pipelines/stable_diffusion/pipeline_stable_diffusion.py#L276
-    text_input = tokenizer(prompts_df.prompt.tolist(), padding="max_length",
+    text_input = tokenizer(prompts, padding="max_length",
                            max_length=tokenizer.model_max_length, truncation=True, return_tensors="pt")
     print(f'model max length: {tokenizer.model_max_length}')
     embeddings = []
     with torch.inference_mode():
+        print(f'len(text_input.input_ids): {len(text_input.input_ids)}')
+        print(f'text_input shape: {text_input.input_ids.shape}')
         for i in range(0, len(text_input.input_ids), 100):
             print(f'embeddings start index: {i}')
             text_embeddings = text_encoder(
                 text_input.input_ids[i: i + 100].to(device),
             )[0]
-            if prompts_df.invert.tolist()[i] == 1:
+            if invert_prompt[i]:
                 text_embeddings = -text_embeddings
                 print(f'inverting prompt {i}')
             embeddings.append(text_embeddings)
