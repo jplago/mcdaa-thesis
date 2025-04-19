@@ -205,7 +205,7 @@ def main():
 
     # check for negative embedding token
     prompts = prompts_df.prompt.tolist()
-    invert_prompt_tensor = torch.tensor([-1 if prompt.startswith('<-1>') else 1 for prompt in prompts])
+    invert_prompt_tensor = torch.tensor([-1 if prompt.startswith('<-1>') else 1 for prompt in prompts]).to("cuda")
     prompts = [prompt.lstrip('<-1>') for prompt in prompts]
     
     # refer to https://github.com/huggingface/diffusers/blob/main/src/diffusers/pipelines/stable_diffusion/pipeline_stable_diffusion.py#L276
@@ -222,8 +222,8 @@ def main():
                 text_input.input_ids[i: i + 100].to(device),
             )[0]
             print(f'text_embeddings shape: {text_embeddings.shape}')
-            print(text_embeddings[:, 0])
-            print((invert_prompt_tensor @ text_embeddings)[:,0])
+            print(text_embeddings[:, 0, 0])
+            print((invert_prompt_tensor @ text_embeddings)[:,0,0])
             print(invert_prompt_tensor)
             embeddings.append(text_embeddings)
     text_embeddings = torch.cat(embeddings, dim=0)
