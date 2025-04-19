@@ -214,17 +214,12 @@ def main():
     print(f'model max length: {tokenizer.model_max_length}')
     embeddings = []
     with torch.inference_mode():
-        print(f'len(text_input.input_ids): {len(text_input.input_ids)}')
-        print(f'text_input shape: {text_input.input_ids.shape}')
         for i in range(0, len(text_input.input_ids), 100):
-            print(f'embeddings start index: {i}')
             text_embeddings = text_encoder(
                 text_input.input_ids[i: i + 100].to(device),
             )[0]
-            print(f'text_embeddings shape: {text_embeddings.shape}')
-            print(text_embeddings[:, 0, 1])
-            print((text_embeddings * invert_prompt_tensor[:, None, None])[:,0,1])
-            print(invert_prompt_tensor)
+            print(f'Invert prompt tensor: {invert_prompt_tensor}')
+            text_embeddings = text_embeddings * invert_prompt_tensor[:, None, None]
             embeddings.append(text_embeddings)
     text_embeddings = torch.cat(embeddings, dim=0)
     assert len(text_embeddings) == len(prompts_df)
