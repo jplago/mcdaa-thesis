@@ -223,7 +223,7 @@ def main():
             )[0]
             print(f'text_embeddings shape: {text_embeddings.shape}')
             print(text_embeddings[:, 0, 0])
-            print((invert_prompt_tensor @ text_embeddings)[:,0,0])
+            print((text_embeddings * invert_prompt_tensor[:, None, None])[:,0,0])
             print(invert_prompt_tensor)
             embeddings.append(text_embeddings)
     text_embeddings = torch.cat(embeddings, dim=0)
