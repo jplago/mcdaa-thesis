@@ -12,7 +12,7 @@ from diffusion.utils import LOG_DIR, get_formatstr
 import torchvision.transforms as torch_transforms
 from torchvision.transforms.functional import InterpolationMode
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
+# Device will be set based on command line argument
 
 INTERPOLATIONS = {
     'bilinear': InterpolationMode.BILINEAR,
@@ -154,9 +154,21 @@ def main():
     # args for adaptively choosing which classes to continue trying
     parser.add_argument('--to_keep', nargs='+', type=int, required=True)
     parser.add_argument('--n_samples', nargs='+', type=int, required=True)
+    parser.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu',
+                        help='Device to use for computation (cuda or cpu)')
 
     args = parser.parse_args()
     assert len(args.to_keep) == len(args.n_samples)
+
+    # Set device
+    device = args.device
+    if device == 'cuda' and not torch.cuda.is_available():
+        print("CUDA is not available. Falling back to CPU.")
+        device = 'cpu'
+    elif device == 'mps' and not torch.backends.mps.is_available():
+        print("MPS is not available. Falling back to CPU.")
+        device = 'cpu'
+    print(f"Using device: {device}")
 
     # make run output folder
     name = f"v{args.version}_{args.n_trials}trials_"
@@ -205,7 +217,7 @@ def main():
 
     # check for negative embedding token
     prompts = prompts_df.prompt.tolist()
-    invert_prompt_tensor = torch.tensor([-1 if prompt.startswith('<-1>') else 1 for prompt in prompts]).to("cuda")
+    invert_prompt_tensor = torch.tensor([-1 if prompt.startswith('<-1>') else 1 for prompt in prompts]).to(device)
     prompts = [prompt.lstrip('<-1>') for prompt in prompts]
     
     # refer to https://github.com/huggingface/diffusers/blob/main/src/diffusers/pipelines/stable_diffusion/pipeline_stable_diffusion.py#L276
@@ -218,7 +230,6 @@ def main():
             text_embeddings = text_encoder(
                 text_input.input_ids[i: i + 100].to(device),
             )[0]
-            print(f'Invert prompt tensor: {invert_prompt_tensor}')
             text_embeddings = text_embeddings * invert_prompt_tensor[:, None, None]
             embeddings.append(text_embeddings)
     text_embeddings = torch.cat(embeddings, dim=0)
@@ -243,8 +254,8 @@ def main():
             print('Skipping', i)
             if args.load_stats:
                 data = torch.load(fname)
-                print(f'label: {data['label']}')
-                print(f'pred: {data['pred']}')
+                print(f"label: {data['label']}")
+                print(f"pred: {data['pred']}")
                 correct += int(data['pred'] == data['label'])
                 total += 1
             continue
